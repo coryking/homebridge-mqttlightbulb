@@ -143,7 +143,7 @@ module.exports = function(homebridge) {
     fixInheritance(mqttlightbulbAccessory.RandomLightbulb,Service);
     fixInheritance(mqttlightbulbAccessory.RandomEffect,Characteristic);
 
-  	homebridge.registerAccessory("homebridge-mqttlightbulb", "mqttlightbulb", mqttlightbulbAccessory);
+  	homebridge.registerAccessory("homebridge-random-mqttlightbulb", "randommqttlightbulb", mqttlightbulbAccessory);
 }
 
 mqttlightbulbAccessory.prototype.getStatus = function(callback) {
