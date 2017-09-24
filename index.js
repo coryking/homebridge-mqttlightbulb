@@ -36,7 +36,7 @@ function fixInheritance(subclass, superclass) {
 }
 
 
-function mqttlightbulbAccessory(log, config) {
+function randommqttlightbulbAccessory(log, config) {
   	this.log          	= log;
   	this.name 			= config["name"];
   	this.url 			= config["url"];
@@ -68,13 +68,13 @@ function mqttlightbulbAccessory(log, config) {
   this.hue = 0;
   this.saturation = 0;
 
-	this.service = new mqttlightbulbAccessory.RandomLightbulb(this.name);
+	this.service = new randommqttlightbulbAccessory.RandomLightbulb(this.name);
   	this.service
       .getCharacteristic(Characteristic.On)
     	.on('get', this.getStatus.bind(this))
     	.on('set', this.setStatus.bind(this));
   	this.service
-      .getCharacteristic(mqttlightbulbAccessory.RandomEffect)
+      .getCharacteristic(randommqttlightbulbAccessory.RandomEffect)
     	.on('get', this.getRandomEffect.bind(this))
     	.on('set', this.setRandomEffect.bind(this));
     this.service
@@ -120,7 +120,7 @@ function mqttlightbulbAccessory(log, config) {
 	if (topic == that.topics.getRandomEffect) {
 		var status = message.toString();
 		that.randomEffect = (status == "true" ? true : false);
-	   	that.service.getCharacteristic(mqttlightbulbAccessory.RandomEffect).setValue(that.randomEffect, undefined, 'fromSetValue');
+	   	that.service.getCharacteristic(randommqttlightbulbAccessory.RandomEffect).setValue(that.randomEffect, undefined, 'fromSetValue');
 	}
     if (topic == that.topics.getSaturation) {
       var val = parseInt(message.toString());
@@ -139,17 +139,17 @@ module.exports = function(homebridge) {
   	Service = homebridge.hap.Service;
   	Characteristic = homebridge.hap.Characteristic;
 
-    fixInheritance(mqttlightbulbAccessory.RandomLightbulb,Service);
-    fixInheritance(mqttlightbulbAccessory.RandomEffect,Characteristic);
+    fixInheritance(randommqttlightbulbAccessory.RandomLightbulb,Service);
+    fixInheritance(randommqttlightbulbAccessory.RandomEffect,Characteristic);
 
-  	homebridge.registerAccessory("homebridge-random-mqttlightbulb", "randommqttlightbulb", mqttlightbulbAccessory);
+  	homebridge.registerAccessory("homebridge-random-mqttlightbulb", "randommqttlightbulb", randommqttlightbulbAccessory);
 }
 
-mqttlightbulbAccessory.prototype.getStatus = function(callback) {
+randommqttlightbulbAccessory.prototype.getStatus = function(callback) {
     callback(null, this.on);
 }
 
-mqttlightbulbAccessory.prototype.setStatus = function(status, callback, context) {
+randommqttlightbulbAccessory.prototype.setStatus = function(status, callback, context) {
 	if(context !== 'fromSetValue') {
 		this.on = status;
 	  this.client.publish(this.topics.setOn, status ? "true" : "false",{ retain: this.retain});
@@ -157,11 +157,11 @@ mqttlightbulbAccessory.prototype.setStatus = function(status, callback, context)
 	callback();
 }
 
-mqttlightbulbAccessory.prototype.getRandomEffect = function(callback) {
+randommqttlightbulbAccessory.prototype.getRandomEffect = function(callback) {
     callback(null, this.randomEffect);
 }
 
-mqttlightbulbAccessory.prototype.setRandomEffect = function(status, callback, context) {
+randommqttlightbulbAccessory.prototype.setRandomEffect = function(status, callback, context) {
 	if(context !== 'fromSetValue') {
 		this.randomEffect = status;
 	  this.client.publish(this.topics.setRandomEffect, status ? "true" : "false",{ retain: this.retain});
@@ -170,11 +170,11 @@ mqttlightbulbAccessory.prototype.setRandomEffect = function(status, callback, co
 }
 
 
-mqttlightbulbAccessory.prototype.getBrightness = function(callback) {
+randommqttlightbulbAccessory.prototype.getBrightness = function(callback) {
     callback(null, this.brightness);
 }
 
-mqttlightbulbAccessory.prototype.setBrightness = function(brightness, callback, context) {
+randommqttlightbulbAccessory.prototype.setBrightness = function(brightness, callback, context) {
 	if(context !== 'fromSetValue') {
 		this.brightness = brightness;
     // console.log("Brightness:",this.brightness);
@@ -183,11 +183,11 @@ mqttlightbulbAccessory.prototype.setBrightness = function(brightness, callback, 
 	callback();
 }
 
-mqttlightbulbAccessory.prototype.getHue = function(callback) {
+randommqttlightbulbAccessory.prototype.getHue = function(callback) {
     callback(null, this.hue);
 }
 
-mqttlightbulbAccessory.prototype.setHue = function(hue, callback, context) {
+randommqttlightbulbAccessory.prototype.setHue = function(hue, callback, context) {
 	if(context !== 'fromSetValue') {
 		this.hue = hue;
     // console.log("Hue:",this.hue);
@@ -196,11 +196,11 @@ mqttlightbulbAccessory.prototype.setHue = function(hue, callback, context) {
 	callback();
 }
 
-mqttlightbulbAccessory.prototype.getSaturation = function(callback) {
+randommqttlightbulbAccessory.prototype.getSaturation = function(callback) {
     callback(null, this.saturation);
 }
 
-mqttlightbulbAccessory.prototype.setSaturation = function(saturation, callback, context) {
+randommqttlightbulbAccessory.prototype.setSaturation = function(saturation, callback, context) {
 	if(context !== 'fromSetValue') {
 		this.saturation = saturation;
     // console.log("Saturation:",this.saturation);
@@ -209,11 +209,11 @@ mqttlightbulbAccessory.prototype.setSaturation = function(saturation, callback, 
 	callback();
 }
 
-mqttlightbulbAccessory.prototype.getServices = function() {
+randommqttlightbulbAccessory.prototype.getServices = function() {
   return [this.service];
 }
 
-mqttlightbulbAccessory.RandomEffect = function() {
+randommqttlightbulbAccessory.RandomEffect = function() {
   Characteristic.call(this, 'Random Effect', '00001004-0000-1000-8000-0026BB76529A');
   this.setProps({
     format: Characteristic.Formats.BOOL,
@@ -222,7 +222,7 @@ mqttlightbulbAccessory.RandomEffect = function() {
   this.value = this.getDefaultValue();
 };
 
-mqttlightbulbAccessory.RandomLightbulb = function(displayName, subtype) {
+randommqttlightbulbAccessory.RandomLightbulb = function(displayName, subtype) {
   Service.call(this, displayName, '00001004-0000-1000-8000-0026BB765291', subtype);
 
   // Required Characteristics
@@ -234,5 +234,5 @@ mqttlightbulbAccessory.RandomLightbulb = function(displayName, subtype) {
   this.addOptionalCharacteristic(Characteristic.Saturation);
   this.addOptionalCharacteristic(Characteristic.Name);
   this.addOptionalCharacteristic(Characteristic.ColorTemperature); //Manual fix to add temperature
-  this.addOptionalCharacteristic(mqttlightbulbAccessory.RandomEffect);
+  this.addOptionalCharacteristic(randommqttlightbulbAccessory.RandomEffect);
 };
