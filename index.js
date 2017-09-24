@@ -65,7 +65,7 @@ function randommqttlightbulbAccessory(log, config) {
     	.on('get', this.getStatus.bind(this))
     	.on('set', this.setStatus.bind(this));
   	this.service
-      .getCharacteristic(RandomLightCharacteristics.RandomEffect)
+      .getCharacteristic(Characteristic.Active)
     	.on('get', this.getRandomEffect.bind(this))
     	.on('set', this.setRandomEffect.bind(this));
     this.service
@@ -110,8 +110,8 @@ function randommqttlightbulbAccessory(log, config) {
     }
 	if (topic == that.topics.getRandomEffect) {
 		var status = message.toString();
-		that.randomEffect = (status == "true" ? true : false);
-	   	that.service.getCharacteristic(RandomLightCharacteristics.RandomEffect).setValue(that.randomEffect, undefined, 'fromSetValue');
+		that.randomEffect = (status == "true" ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE);
+	   	that.service.getCharacteristic(Characteristic.Active).setValue(that.randomEffect, undefined, 'fromSetValue');
 	}
     if (topic == that.topics.getSaturation) {
       var val = parseInt(message.toString());
