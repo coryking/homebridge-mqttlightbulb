@@ -25,7 +25,9 @@
     "Lightbulb"
   ],
   "dependencies": {
-    "mqtt": "^1.6.3"
+    "mqtt": "^1.6.3",
+    "inherits": "^2.0.1",
+    "util": "^0.10.x"
   },
   "author": "ameeuw",
   "license": "GPL2",
