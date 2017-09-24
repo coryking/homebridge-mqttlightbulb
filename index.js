@@ -69,7 +69,6 @@ function mqttlightbulbAccessory(log, config) {
   this.saturation = 0;
 
 	this.service = new mqttlightbulbAccessory.RandomLightbulb(this.name);
-    this.service.addOptionalCharacteristic(Cha)
   	this.service
       .getCharacteristic(Characteristic.On)
     	.on('get', this.getStatus.bind(this))
