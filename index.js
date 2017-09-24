@@ -21,19 +21,10 @@
 
 'use strict';
 
-var Service, Characteristic;
+var Service, Characteristic, Accessory, uuid, RandomLightCharacteristics, RandomLightService;
 var mqtt = require("mqtt");
 var inherits = require('util').inherits;
 
-// Necessary because Accessory is defined after we have defined all of our classes
-function fixInheritance(subclass, superclass) {
-    var proto = subclass.prototype;
-    inherits(subclass, superclass);
-    subclass.prototype.parent = superclass.prototype;
-    for (var mn in proto) {
-        subclass.prototype[mn] = proto[mn];
-    }
-}
 
 
 function randommqttlightbulbAccessory(log, config) {
@@ -61,20 +52,20 @@ function randommqttlightbulbAccessory(log, config) {
 	};
 	this.caption		= config["caption"];
 	this.retain             = config["retain"];
-  this.topics = config["topics"];
+    this.topics = config["topics"];
 	this.on = false;
     this.randomEffect = false;
   this.brightness = 0;
   this.hue = 0;
   this.saturation = 0;
 
-	this.service = new randommqttlightbulbAccessory.RandomLightbulb(this.name);
+	this.service = new RandomLightService.RandomLightbulb(this.name);
   	this.service
       .getCharacteristic(Characteristic.On)
     	.on('get', this.getStatus.bind(this))
     	.on('set', this.setStatus.bind(this));
   	this.service
-      .getCharacteristic(randommqttlightbulbAccessory.RandomEffect)
+      .getCharacteristic(RandomLightCharacteristics.RandomEffect)
     	.on('get', this.getRandomEffect.bind(this))
     	.on('set', this.setRandomEffect.bind(this));
     this.service
@@ -120,7 +111,7 @@ function randommqttlightbulbAccessory(log, config) {
 	if (topic == that.topics.getRandomEffect) {
 		var status = message.toString();
 		that.randomEffect = (status == "true" ? true : false);
-	   	that.service.getCharacteristic(randommqttlightbulbAccessory.RandomEffect).setValue(that.randomEffect, undefined, 'fromSetValue');
+	   	that.service.getCharacteristic(RandomLightCharacteristics.RandomEffect).setValue(that.randomEffect, undefined, 'fromSetValue');
 	}
     if (topic == that.topics.getSaturation) {
       var val = parseInt(message.toString());
@@ -138,9 +129,9 @@ function randommqttlightbulbAccessory(log, config) {
 module.exports = function(homebridge) {
   	Service = homebridge.hap.Service;
   	Characteristic = homebridge.hap.Characteristic;
-
-    fixInheritance(randommqttlightbulbAccessory.RandomLightbulb,Service);
-    fixInheritance(randommqttlightbulbAccessory.RandomEffect,Characteristic);
+    RandomLightCharacteristics = require('./lib/customCharacteristics').RandomLightCharacteristics(Characteristic);
+    RandomLightService = require('./lib/customCharacteristics').RandomLightService(Service);
+    
 
   	homebridge.registerAccessory("homebridge-random-mqttlightbulb", "randommqttlightbulb", randommqttlightbulbAccessory);
 }
@@ -212,27 +203,3 @@ randommqttlightbulbAccessory.prototype.setSaturation = function(saturation, call
 randommqttlightbulbAccessory.prototype.getServices = function() {
   return [this.service];
 }
-
-randommqttlightbulbAccessory.RandomEffect = function() {
-  Characteristic.call(this, 'Random Effect', '00001004-0000-1000-8000-0026BB76529A');
-  this.setProps({
-    format: Characteristic.Formats.BOOL,
-    perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
-  });
-  this.value = this.getDefaultValue();
-};
-
-randommqttlightbulbAccessory.RandomLightbulb = function(displayName, subtype) {
-  Service.call(this, displayName, '00001004-0000-1000-8000-0026BB765291', subtype);
-
-  // Required Characteristics
-  this.addCharacteristic(Characteristic.On);
-
-  // Optional Characteristics
-  this.addOptionalCharacteristic(Characteristic.Brightness);
-  this.addOptionalCharacteristic(Characteristic.Hue);
-  this.addOptionalCharacteristic(Characteristic.Saturation);
-  this.addOptionalCharacteristic(Characteristic.Name);
-  this.addOptionalCharacteristic(Characteristic.ColorTemperature); //Manual fix to add temperature
-  this.addOptionalCharacteristic(randommqttlightbulbAccessory.RandomEffect);
-};
