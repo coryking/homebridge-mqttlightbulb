@@ -21,7 +21,7 @@
 
 'use strict';
 
-var Service, Characteristic, Accessory, uuid, RandomLightCharacteristics, RandomLightService;
+var Service, Characteristic, Accessory, uuid, RandomLightCharacteristics;
 var mqtt = require("mqtt");
 var inherits = require('util').inherits;
 
@@ -59,7 +59,7 @@ function randommqttlightbulbAccessory(log, config) {
   this.hue = 0;
   this.saturation = 0;
 
-	this.service = new RandomLightService.RandomLightbulb(this.name);
+	this.service = new RandomLightCharacteristics.RandomLightbulb(this.name);
   	this.service
       .getCharacteristic(Characteristic.On)
     	.on('get', this.getStatus.bind(this))
@@ -129,10 +129,8 @@ function randommqttlightbulbAccessory(log, config) {
 module.exports = function(homebridge) {
   	Service = homebridge.hap.Service;
   	Characteristic = homebridge.hap.Characteristic;
-    RandomLightCharacteristics = require('./lib/customCharacteristics').RandomLightCharacteristics(Characteristic);
-    RandomLightService = require('./lib/customCharacteristics').RandomLightService(Service);
+    RandomLightCharacteristics = require('./lib/customCharacteristics').RandomLightCharacteristics(Characteristic, Service);
     
-
   	homebridge.registerAccessory("homebridge-random-mqttlightbulb", "randommqttlightbulb", randommqttlightbulbAccessory);
 }
 
